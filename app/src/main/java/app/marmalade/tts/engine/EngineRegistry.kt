@@ -2,6 +2,7 @@ package app.marmalade.tts.engine
 
 import app.marmalade.tts.data.CloudApiVoiceCatalog
 import app.marmalade.tts.data.KittenDirectVoiceCatalog
+import app.marmalade.tts.data.LeokaniVoiceCatalog
 import app.marmalade.tts.data.KokoroDirectVoiceCatalog
 import app.marmalade.tts.data.KokoroGermanVoiceCatalog
 import app.marmalade.tts.data.PocketDevVoiceCatalog
@@ -9,6 +10,7 @@ import app.marmalade.tts.data.PocketVoiceCatalog
 import app.marmalade.tts.data.VitsVoiceCatalog
 import app.marmalade.tts.engine.api.CloudApiEngine
 import app.marmalade.tts.engine.kitten.KittenDirectEngine
+import app.marmalade.tts.engine.leokani.LeokaniEngine
 import app.marmalade.tts.engine.kokoro.KokoroDirectEngine
 import app.marmalade.tts.engine.kokoro.KokoroGermanEngine
 import app.marmalade.tts.engine.vits.VitsDirectEngine
@@ -37,12 +39,13 @@ class EngineRegistry internal constructor(engines: List<TtsEngine>) {
         kokoroDirect: KokoroDirectEngine,
         kokoroGerman: KokoroGermanEngine,
         kittenDirect: KittenDirectEngine,
+        leokani: LeokaniEngine,
         pocket: PocketEngine,
         pocketDev: PocketDevEngine,
         vits: VitsDirectEngine,
         cloudApi: CloudApiEngine,
         buildTypeEngines: Set<@JvmSuppressWildcards TtsEngine>,
-    ) : this(listOf(kokoroDirect, kokoroGerman, kittenDirect, pocket, pocketDev, vits, cloudApi) + buildTypeEngines)
+    ) : this(listOf(kokoroDirect, kokoroGerman, kittenDirect, leokani, pocket, pocketDev, vits, cloudApi) + buildTypeEngines)
 
     private val table: Map<String, TtsEngine> = engines.associateByTo(LinkedHashMap()) { it.engineName }
 
@@ -82,6 +85,7 @@ class EngineRegistry internal constructor(engines: List<TtsEngine>) {
             KokoroDirectVoiceCatalog.ENGINE,
             KokoroGermanVoiceCatalog.ENGINE,
             KittenDirectVoiceCatalog.ENGINE,
+            LeokaniVoiceCatalog.ENGINE,
             PocketVoiceCatalog.ENGINE,
             PocketDevVoiceCatalog.ENGINE,
             VitsVoiceCatalog.ENGINE,
