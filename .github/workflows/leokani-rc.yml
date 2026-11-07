@@ -51,13 +51,13 @@ jobs:
           restore-keys: leokani-rc-gradle-${{ runner.os }}-
 
       - name: Build debug-signed F-Droid release candidate
-        run: ./gradlew --no-daemon :app:assembleFdroidRc
+        run: ./gradlew --no-daemon -PsmokeRelease :app:assembleFdroidRelease
 
       - name: Stage APK and checksum
         run: |
           set -euo pipefail
           mkdir -p dist
-          cp app/build/outputs/apk/fdroid/rc/app-fdroid-rc.apk dist/marmalade-leokani-rc.apk
+          cp app/build/outputs/apk/fdroid/release/app-fdroid-release.apk dist/marmalade-leokani-rc.apk
           (cd dist && sha256sum *.apk > SHA256SUMS.txt)
 
       - uses: actions/upload-artifact@v4
