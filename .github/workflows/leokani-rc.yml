@@ -1,0 +1,90 @@
+name: Leokani experimental pre-release
+
+# Separate from upstream's signed release.yml. The RC variant uses Android's
+# debug signing key and the ".rc" applicationIdSuffix, so it can coexist with
+# normal Marmalade without using (or impersonating) upstream distribution keys.
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/leokani-rc.yml"
+      - "app/src/main/**"
+      - "app/src/test/**"
+      - "app/build.gradle.kts"
+      - "gradle/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  leokani-rc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout (with espeak-ng submodule)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+
+      - name: Install required Android NDK / CMake
+        run: |
+          set -euo pipefail
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "ndk;26.3.11579264" "cmake;3.22.1"
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: leokani-rc-gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', 'gradle/libs.versions.toml') }}
+          restore-keys: leokani-rc-gradle-${{ runner.os }}-
+
+      - name: Build debug-signed F-Droid release candidate
+        run: ./gradlew --no-daemon :app:assembleFdroidRc
+
+      - name: Stage APK and checksum
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          cp app/build/outputs/apk/fdroid/rc/app-fdroid-rc.apk dist/marmalade-leokani-rc.apk
+          (cd dist && sha256sum *.apk > SHA256SUMS.txt)
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: marmalade-leokani-rc
+          path: dist/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Publish experimental GitHub pre-release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: leokani-rc-${{ github.run_number }}
+          target_commitish: ${{ github.sha }}
+          name: Leokani experimental RC #${{ github.run_number }}
+          prerelease: true
+          draft: false
+          body: |
+            Experimental fork-only build of Marmalade TTS with Leokani 7M engine code.
+            
+            - APK package: `app.marmalade.tts.rc` (side-by-side install).
+            - APK is signed with the workflow runner's **temporary debug key**, not
+              Marmalade's official release key. Uninstall this RC before installing
+              an RC built on a different runner.
+            - Leokani model weights are **not** included. Its model installer/catalog
+              integration is not complete; this is a build-validation artifact.
+            - Not an upstream release, not an F-Droid update, not production-ready.
+          files: |
+            dist/marmalade-leokani-rc.apk
+            dist/SHA256SUMS.txt
