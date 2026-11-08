@@ -249,4 +249,7 @@
     <string name="engine_leokani_desc">Experimental English text-to-speech with a small 7M-parameter model. A 6.3 MB optional download, local eSpeak pronunciation and ONNX Runtime inference. Single voice, not yet benchmarked on Android.</string>
     <string name="engine_leokani_license">CC BY-NC 4.0 model weights; the app uses built-in eSpeak-ng (GPL-3.0-or-later). Original license and model card included in the optional download.</string>
 
+    <string name="engine_paradee_tagline">Four natural English voices in one compact download.</string>
+    <string name="engine_paradee_desc">Four offline English voices: American Heart and Puck, British Isabella and Fable. Small int8 ONNX model with local eSpeak phonemization. Experimental fork engine; device speed and voice quality under review.</string>
+    <string name="engine_paradee_license">Apache-2.0 model and pronunciation mapping, plus the built-in eSpeak-ng phonemizer (GPL-3.0-or-later). Original license included in download.</string>
 </resources>
