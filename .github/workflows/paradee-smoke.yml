@@ -1,0 +1,68 @@
+name: Paradee four-voice Android smoke test
+on:
+  push:
+    branches: [feat/paradee-phonon-pivo-woof]
+    paths:
+      - ".github/workflows/paradee-smoke.yml"
+      - "app/src/main/**"
+      - "app/src/test/**"
+      - "app/src/androidTest/java/app/marmalade/tts/engine/paradee/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - name: Install Android NDK and CMake
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "ndk;26.3.11579264" "cmake;3.22.1"
+      - name: JVM regression tests
+        run: |
+          ./gradlew --no-daemon :app:testFdroidDebugUnitTest \
+            --tests 'app.marmalade.tts.install.EngineCatalogTest' \
+            --tests 'app.marmalade.tts.engine.EngineRegistryTest' \
+            --tests 'app.marmalade.tts.data.LicenseCatalogTest' \
+            --tests 'app.marmalade.tts.engine.paradee.*'
+      - name: Compile and package Android APK
+        run: ./gradlew --no-daemon :app:assembleFdroidDebug :app:assembleFdroidDebugAndroidTest
+      - name: Check published model download checksum
+        run: |
+          curl -fL --retry 3 -o paradee.tar.gz \
+            https://github.com/barakplasma/marmalade-tts-android/releases/download/paradee-model-v1_2/paradee-8m-v1_2.tar.gz
+          echo '3d8378e5c4caf4e11467c59b2a761fbfe1cd8716a9474c6f5447bb830f5f6ad2  paradee.tar.gz' | sha256sum -c -
+      - name: Emulator inference test
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          script: |
+            set -e
+            adb install -r app/build/outputs/apk/fdroid/debug/app-fdroid-debug.apk
+            adb install -r app/build/outputs/apk/androidTest/fdroid/debug/app-fdroid-debug-androidTest.apk
+            adb shell am instrument -w -e class app.marmalade.tts.engine.paradee.ParadeeSynthesisInstrumentedTest app.marmalade.tts.debug.test/androidx.test.runner.AndroidJUnitRunner | tee paradee-instrumentation.log
+            grep -F 'OK (1 test)' paradee-instrumentation.log
+            adb exec-out run-as app.marmalade.tts.debug cat files/paradee-smoke.pcm > paradee-smoke.pcm
+            python3 -c "import wave,pathlib; pcm=pathlib.Path('paradee-smoke.pcm').read_bytes(); w=wave.open('paradee-smoke.wav','wb'); w.setnchannels(1); w.setsampwidth(2); w.setframerate(24000); w.writeframes(pcm); w.close()"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: paradee-android-evidence
+          path: |
+            paradee-instrumentation.log
+            paradee-smoke.wav
+          if-no-files-found: ignore
