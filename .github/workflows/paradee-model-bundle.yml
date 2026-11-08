@@ -1,0 +1,53 @@
+name: Package Paradee 8M four-voice ONNX bundle
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/paradee-model-bundle.yml"
+      - "tools/paradee/make_bundle.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Build deterministic model archive
+        run: |
+          pip install huggingface_hub
+          python tools/paradee/make_bundle.py
+          sha256sum paradee-8m-v1_2.tar.gz > SHA256SUMS.txt
+      - name: Check archive layout
+        run: |
+          tar -tzf paradee-8m-v1_2.tar.gz > paths.txt
+          for f in model.onnx config.json LICENSE MODEL_CARD.md; do
+            grep -Fx "paradee-8m-v1_2/$f" paths.txt > /dev/null
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paradee-int8-4-voices
+          path: |
+            paradee-8m-v1_2.tar.gz
+            paradee-bundle-metadata.json
+            SHA256SUMS.txt
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: paradee-model-v1_2
+          target_commitish: ${{ github.sha }}
+          name: Paradee 8M v1.2 four-voice ONNX model
+          prerelease: true
+          body: |
+            Optional Apache-2.0 Paradee model data from the pinned
+            Hugging Face checkpoint.
+            Contains the unmodified int8 ONNX weights, vocabulary, model
+            card and upstream license. Used by Marmalade experimental.
+          files: |
+            paradee-8m-v1_2.tar.gz
+            paradee-bundle-metadata.json
+            SHA256SUMS.txt
