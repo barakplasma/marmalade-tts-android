@@ -58,6 +58,7 @@ object VoiceCredits {
             VitsVoiceCatalog.packIdOf(voice.id)?.let { VoicePackCatalog.byId(it) }?.credit
         KokoroGermanVoiceCatalog.ENGINE -> KokoroGermanVoiceCatalog.CREDIT
         LeokaniVoiceCatalog.ENGINE -> VoiceCredit(source = "Milliwatt Labs", license = "CC BY-NC 4.0")
+        ParadeeVoiceCatalog.ENGINE -> VoiceCredit(source = "Sahil Mahendrakar / Kokoro", license = "Apache-2.0")
         else -> null
     }
 }
