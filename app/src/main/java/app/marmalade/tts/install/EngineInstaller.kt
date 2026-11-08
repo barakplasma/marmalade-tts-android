@@ -1541,6 +1541,7 @@ open class EngineInstaller @Inject constructor(
             "leokani-tts-7m"          -> verifyLeokaniLayout(dir)
             "paradee-8m-v1_2"         -> verifyParadeeLayout(dir)
             "pivo-1m-v1"              -> verifyPiVoLayout(dir)
+            "phonon-31m-en"           -> verifyPhononLayout(dir)
             "kitten-direct-v0_8"       -> verifyKittenDirectLayout(dir)
             "kokoro-direct-v1_0"       -> verifyKokoroDirectLayout(dir)
             "kokoro-de-v1_0"           -> verifyKokoroDeLayout(dir)
@@ -1684,6 +1685,14 @@ open class EngineInstaller @Inject constructor(
      * checks them.
      */
     /** Leokani model bundle: ONNX weights + vocabulary + upstream attribution. */
+    private fun verifyPhononLayout(dir: File): InstallState {
+        for (name in listOf("model.q8.gguf", "config.json", "tokenizer.json",
+            "default-voice.safetensors", "MODEL_CARD.md")) {
+            if (File(dir, name).length() == 0L) return InstallState.Corrupt
+        }
+        return InstallState.Installed
+    }
+
     private fun verifyPiVoLayout(dir: File): InstallState {
         for (name in listOf("encoder.onnx", "decoder.onnx", "conditioning.onnx", "vocoder_step.onnx")) {
             val file = File(dir, name)
