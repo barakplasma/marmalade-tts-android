@@ -45,6 +45,10 @@ jobs:
       - name: Build debug app and androidTest APK
         run: ./gradlew --no-daemon :app:assembleFdroidDebug :app:assembleFdroidDebugAndroidTest
 
+      - name: Enable KVM acceleration
+        run: |
+          if [ -e /dev/kvm ]; then sudo chmod 666 /dev/kvm; fi
+
       - name: Run real ONNX and espeak synthesis on Android emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -57,16 +61,16 @@ jobs:
             set -e
             adb install -r app/build/outputs/apk/fdroid/debug/app-fdroid-debug.apk
             adb install -r app/build/outputs/apk/androidTest/fdroid/debug/app-fdroid-debug-androidTest.apk
-            adb push model-bundle/leokani-tts-7m/model.onnx /data/local/tmp/leokani-model.onnx
-            adb push model-bundle/leokani-tts-7m/config.json /data/local/tmp/leokani-config.json
-            adb shell run-as app.marmalade.tts.debug mkdir -p files/engines/leokani-tts-7m
-            adb shell run-as app.marmalade.tts.debug cp /data/local/tmp/leokani-model.onnx files/engines/leokani-tts-7m/model.onnx
-            adb shell run-as app.marmalade.tts.debug cp /data/local/tmp/leokani-config.json files/engines/leokani-tts-7m/config.json
+            # The test uses EngineInstaller + UrlHttpFetcher itself: no model pre-seeding.
             adb shell am instrument -w -e class app.marmalade.tts.engine.leokani.LeokaniSynthesisInstrumentedTest app.marmalade.tts.debug.test/androidx.test.runner.AndroidJUnitRunner | tee leokani-instrumentation.log
             grep -F "OK (1 test)" leokani-instrumentation.log
+            adb exec-out run-as app.marmalade.tts.debug cat files/leokani-smoke.pcm > leokani-smoke.pcm
+            python3 -c "import wave,pathlib; pcm=pathlib.Path('leokani-smoke.pcm').read_bytes(); w=wave.open('leokani-smoke.wav','wb'); w.setnchannels(1); w.setsampwidth(2); w.setframerate(24000); w.writeframes(pcm); w.close()"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: leokani-instrumentation-log
-          path: leokani-instrumentation.log
+          name: leokani-emulator-audio-proof
+          path: |
+            leokani-instrumentation.log
+            leokani-smoke.wav
           if-no-files-found: ignore
