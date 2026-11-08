@@ -254,5 +254,5 @@
     <string name="engine_paradee_license">Apache-2.0 model and pronunciation mapping, plus the built-in eSpeak-ng phonemizer (GPL-3.0-or-later). Original license included in download.</string>
     <string name="engine_pivo_tagline">Two compact synthetic voices for offline English.</string>
     <string name="engine_pivo_desc">Pi and Vo, two experimental English voices from a 1.4M-parameter acoustic model and vocoder. 16 kHz audio, fully local ONNX inference, CMU pronunciation dictionary. Research-quality, sometimes metallic or robotic.</string>
-    <string name="engine_pivo_license">Apache-2.0 model and app port; included CMU dictionary has its own attribution license (bundled with the download).</string>
+    <string name="engine_pivo_license">Apache-2.0 model and app port; CMU dictionary attribution included. No GPL engine components.</string>
 </resources>
