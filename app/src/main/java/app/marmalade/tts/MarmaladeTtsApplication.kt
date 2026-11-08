@@ -10,6 +10,7 @@ import app.marmalade.tts.data.PocketVoiceCatalog
 import app.marmalade.tts.data.KittenDirectVoiceCatalog
 import app.marmalade.tts.data.LeokaniVoiceCatalog
 import app.marmalade.tts.data.ParadeeVoiceCatalog
+import app.marmalade.tts.data.PiVoVoiceCatalog
 import app.marmalade.tts.data.KokoroDirectVoiceCatalog
 import app.marmalade.tts.data.KokoroGermanVoiceCatalog
 import app.marmalade.tts.data.BuiltinEffects
@@ -185,6 +186,7 @@ class MarmaladeTtsApplication : Application() {
                 dao.upsertAll(KittenDirectVoiceCatalog.voices)
                 dao.upsertAll(LeokaniVoiceCatalog.voices)
                 dao.upsertAll(ParadeeVoiceCatalog.voices)
+                dao.upsertAll(PiVoVoiceCatalog.voices)
                 dao.upsertAll(PocketVoiceCatalog.voices)
                 dao.upsertAll(PocketDevVoiceCatalog.voices)
                 dao.upsertAll(VitsVoiceCatalog.voices)
@@ -424,6 +426,6 @@ class MarmaladeTtsApplication : Application() {
          *    and system-TTS clients keep working; an installed pack's row is
          *    this same catalog row, so it is renamed too.
          */
-        const val CATALOG_VERSION: Int = 44
+        const val CATALOG_VERSION: Int = 45
     }
 }
