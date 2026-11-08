@@ -589,6 +589,30 @@ object EngineCatalog {
         fdroidOnly = true,
     )
 
+    /** Four English voices share one ONNX graph; no model bytes in APK. */
+    private val PARADEE_8M: EngineDescriptor = EngineDescriptor(
+        name = "paradee-8m-v1_2",
+        displayName = "Paradee",
+        releaseName = "Paradee 8M (v1.2, four voices)",
+        descriptionRes = R.string.engine_paradee_desc,
+        downloadSizeBytes = 7_067_233L,
+        installedSizeBytes = 8_484_016L,
+        isRecommended = false,
+        archive = EngineArchive(
+            url = "https://github.com/barakplasma/marmalade-tts-android/releases/download/paradee-model-v1_2/paradee-8m-v1_2.tar.gz",
+            sha256 = "3d8378e5c4caf4e11467c59b2a761fbfe1cd8716a9474c6f5447bb830f5f6ad2",
+            sizeBytes = 7_067_233L,
+            archiveRoot = "paradee-8m-v1_2/",
+        ),
+        licenseNotice = "LICENSES/paradee-8m.md",
+        licenseSummaryRes = R.string.engine_paradee_license,
+        taglineRes = R.string.engine_paradee_tagline,
+        speedTier = SpeedTier.HEAVY,
+        quality = QualityGrade.BASIC,
+        languageCodes = listOf("en-US", "en-GB"),
+        fdroidOnly = true,
+    )
+
     private val VITS_MARMALADE: EngineDescriptor = run {
         val defaultPack = VoicePackCatalog.defaultPackFor(VoicePackCatalog.VITS_MARMALADE_ENGINE)
             ?: error("vits-marmalade-v1 has no voice packs in VoicePackCatalog")
@@ -641,6 +665,7 @@ object EngineCatalog {
         POCKET_TTS_EN,
         POCKET_TTS_EN_DEV,
         LEOKANI_TTS_7M,
+        PARADEE_8M,
         VITS_MARMALADE,
     )
 
