@@ -311,6 +311,17 @@ object LicenseCatalog {
                 "G2P tables follows, is adapted from polm/cutlet.",
         ),
         Component(
+            key = "pivo-1m-v1",
+            name = "PiVo 1.4M",
+            role = "Experimental neural English speech model and FARGAN vocoder",
+            shipsIn = "Engine bundle (downloaded)",
+            licenseId = "Apache-2.0",
+            copyright = listOf("PiVo: Leon Lehmann / Empero Research"),
+            note = "The optional model bundle includes model, lexicon and " +
+                "upstream third-party notices. The CMU Pronouncing Dictionary " +
+                "has its own license carried with the bundle.",
+        ),
+        Component(
             key = "paradee-8m-v1_2",
             name = "Paradee 8M v1.2",
             role = "Optional four-voice English neural TTS model",
