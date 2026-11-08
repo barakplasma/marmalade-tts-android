@@ -1540,6 +1540,7 @@ open class EngineInstaller @Inject constructor(
             "pocket-tts-en-v2026_04-dev" -> verifyPocketLayout(dir, PocketDevVoiceCatalog.voices)
             "leokani-tts-7m"          -> verifyLeokaniLayout(dir)
             "paradee-8m-v1_2"         -> verifyParadeeLayout(dir)
+            "pivo-1m-v1"              -> verifyPiVoLayout(dir)
             "kitten-direct-v0_8"       -> verifyKittenDirectLayout(dir)
             "kokoro-direct-v1_0"       -> verifyKokoroDirectLayout(dir)
             "kokoro-de-v1_0"           -> verifyKokoroDeLayout(dir)
@@ -1683,6 +1684,17 @@ open class EngineInstaller @Inject constructor(
      * checks them.
      */
     /** Leokani model bundle: ONNX weights + vocabulary + upstream attribution. */
+    private fun verifyPiVoLayout(dir: File): InstallState {
+        for (name in listOf("encoder.onnx", "decoder.onnx", "conditioning.onnx", "vocoder_step.onnx")) {
+            val file = File(dir, name)
+            if (!file.isFile || file.length() == 0L) return InstallState.Corrupt
+        }
+        for (name in listOf("metadata.json", "cmudict.dict", "LICENSE", "MODEL_CARD.md", "CMUDICT_LICENSE")) {
+            if (File(dir, name).length() == 0L) return InstallState.Corrupt
+        }
+        return InstallState.Installed
+    }
+
     private fun verifyParadeeLayout(dir: File): InstallState {
         val model = File(dir, "model.onnx")
         if (!model.isFile || model.length() < MIN_MODEL_BYTES) return InstallState.Corrupt
