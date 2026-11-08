@@ -568,7 +568,7 @@ object EngineCatalog {
      */
     private val LEOKANI_TTS_7M: EngineDescriptor = EngineDescriptor(
         name = "leokani-tts-7m",
-        displayName = "Leokani 7M (experimental)",
+        displayName = "Leokani 7M",
         releaseName = "Leokani 7M (int8)",
         descriptionRes = R.string.engine_leokani_desc,
         downloadSizeBytes = 6_256_173L,
