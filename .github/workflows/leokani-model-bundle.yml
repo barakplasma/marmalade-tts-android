@@ -1,0 +1,66 @@
+name: Package Leokani model bundle
+
+# A distinct model-only release: the Android installer downloads model data,
+# never executable code. No upstream Marmalade signing keys are involved.
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/leokani-model-bundle.yml"
+      - "tools/leokani/make_bundle.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  package-model:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Download pinned upstream model and make bundle
+        run: |
+          python -m pip install huggingface_hub
+          python tools/leokani/make_bundle.py
+          sha256sum leokani-tts-7m.tar.gz > SHA256SUMS.txt
+          python -m json.tool leokani-bundle-metadata.json
+      - name: Verify bundle paths and license
+        run: |
+          set -euo pipefail
+          tar -tzf leokani-tts-7m.tar.gz
+          for path in model.onnx config.json LICENSE MODEL_CARD.md; do
+            tar -tzf leokani-tts-7m.tar.gz | grep -qx "leokani-tts-7m/$path"
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: leokani-model-bundle
+          path: |
+            leokani-tts-7m.tar.gz
+            leokani-bundle-metadata.json
+            SHA256SUMS.txt
+          retention-days: 30
+      - name: Publish pinned model archive
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: leokani-model-v1
+          target_commitish: ${{ github.sha }}
+          name: Leokani 7M optional model data (int8)
+          prerelease: true
+          draft: false
+          body: |
+            Optional noncommercial Leokani 7M model bundle for the
+            Marmalade experimental engine, sourced from
+            https://huggingface.co/milliwattlabs/leokani-tts-7M
+            at pinned revision ba0beb24f7b124dc1eb297ffc28d01db892462bd.
+
+            Model weights: CC BY-NC 4.0. The archive includes the
+            original license and model card. No executable code.
+            Use only with the experimental Marmalade fork.
+          files: |
+            leokani-tts-7m.tar.gz
+            leokani-bundle-metadata.json
+            SHA256SUMS.txt
