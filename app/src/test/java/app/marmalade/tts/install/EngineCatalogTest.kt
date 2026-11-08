@@ -50,6 +50,8 @@ class EngineCatalogTest {
                 // Developer-only clean-room Pocket (diagnostic; shares the
                 // production Pocket bundle payload).
                 "pocket-tts-en-v2026_04-dev",
+                // Optional fork-only Leokani model (F-Droid experimental).
+                "leokani-tts-7m",
                 // Developer-only while the pack UI is built out; pack-based,
                 // so its archive/sizes mirror its default voice pack.
                 "vits-marmalade-v1",
@@ -71,6 +73,7 @@ class EngineCatalogTest {
                 "kokoro-de-v1_0" to "Kokoro German",
                 "pocket-tts-en-v2026_04" to "Pocket TTS",
                 "pocket-tts-en-v2026_04-dev" to "Pocket TTS Clean",
+                "leokani-tts-7m" to "Leokani 7M",
                 "vits-marmalade-v1" to "VITS Marmalade",
             ),
             EngineCatalog.all.associate { it.name to it.displayName },
@@ -136,13 +139,13 @@ class EngineCatalogTest {
     }
 
     @Test
-    fun onlyThePocketDevTwinIsFdroidOnly_pocketShipsOnBothFlavors() {
+    fun fdroidOnlyIncludesTheExperimentalLeokaniEngine() {
         // Max, 2026-09-06: the Play catalog is quality-controlled. Pocket
         // reached Play on 2026-10-09 (issue #29); its diagnostic twin stays
         // F-Droid-only. Both engines stay resolvable via byName so nothing
         // on disk ever orphans.
         assertEquals(
-            setOf("pocket-tts-en-v2026_04-dev"),
+            setOf("pocket-tts-en-v2026_04-dev", "leokani-tts-7m"),
             EngineCatalog.all.filter { it.fdroidOnly }.map { it.name }.toSet(),
         )
         for (showDeveloper in listOf(false, true)) {
@@ -159,9 +162,10 @@ class EngineCatalogTest {
             )
         }
         assertEquals(
-            "the flavors offer ordinary users the same engines",
-            EngineCatalog.visibleTo(showDeveloper = false, flavor = "fdroid"),
-            EngineCatalog.visibleTo(showDeveloper = false, flavor = "play"),
+            "the F-Droid flavor adds experimental Leokani while Play excludes it",
+            EngineCatalog.visibleTo(showDeveloper = false, flavor = "play").toSet() +
+                EngineCatalog.byName("leokani-tts-7m")!!,
+            EngineCatalog.visibleTo(showDeveloper = false, flavor = "fdroid").toSet(),
         )
         assertNotNull(EngineCatalog.byName("pocket-tts-en-v2026_04-dev"))
     }
@@ -454,7 +458,11 @@ class EngineCatalogTest {
             "kitten-direct-v0_8" to QualityGrade.GOOD,
             "vits-marmalade-v1" to QualityGrade.BASIC,
         )
-        assertEquals(expected, EngineCatalog.all.associate { it.name to it.quality })
+        // Experimental Leokani uses a provisional tier; do not misrepresent it
+        // as one of Max's listening-validated upstream quality grades.
+        assertEquals(expected, EngineCatalog.all
+            .filterNot { it.name == "leokani-tts-7m" }
+            .associate { it.name to it.quality })
         // Pocket and Kokoro fill the meter; Kitten is one below, VITS two.
         assertEquals(4, QualityGrade.EXCELLENT.meterFill)
         assertEquals(3, EngineCatalog.byName("kitten-direct-v0_8")!!.quality.meterFill)
