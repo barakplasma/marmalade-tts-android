@@ -3,6 +3,7 @@ package app.marmalade.tts.engine
 import app.marmalade.tts.data.CloudApiVoiceCatalog
 import app.marmalade.tts.data.KittenDirectVoiceCatalog
 import app.marmalade.tts.data.LeokaniVoiceCatalog
+import app.marmalade.tts.data.ParadeeVoiceCatalog
 import app.marmalade.tts.data.KokoroDirectVoiceCatalog
 import app.marmalade.tts.data.KokoroGermanVoiceCatalog
 import app.marmalade.tts.data.PocketDevVoiceCatalog
@@ -53,6 +54,7 @@ class EngineRegistryTest {
             KokoroGermanVoiceCatalog.ENGINE,
             KittenDirectVoiceCatalog.ENGINE,
             LeokaniVoiceCatalog.ENGINE,
+            ParadeeVoiceCatalog.ENGINE,
             PocketVoiceCatalog.ENGINE,
             PocketDevVoiceCatalog.ENGINE,
             VitsVoiceCatalog.ENGINE,
@@ -113,6 +115,7 @@ class EngineRegistryTest {
                 KokoroGermanVoiceCatalog.ENGINE,
                 KittenDirectVoiceCatalog.ENGINE,
                 LeokaniVoiceCatalog.ENGINE,
+                ParadeeVoiceCatalog.ENGINE,
                 PocketVoiceCatalog.ENGINE,
                 VitsVoiceCatalog.ENGINE,
             ),
