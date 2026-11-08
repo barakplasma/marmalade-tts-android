@@ -14,17 +14,20 @@ from pathlib import Path
 from huggingface_hub import hf_hub_download
 
 REPO = "milliwattlabs/leokani-tts-7M"
+REVISION = "ba0beb24f7b124dc1eb297ffc28d01db892462bd"
 OUTPUT = Path("leokani-tts-7m.tar.gz")
 FILES = {
     "leokani-tts-int8.onnx": "model.onnx",
     "config.json": "config.json",
+    "LICENSE": "LICENSE",
+    "README.md": "MODEL_CARD.md",
 }
 
 
 def main():
     entries = []
     for upstream, target in FILES.items():
-        data = Path(hf_hub_download(REPO, upstream)).read_bytes()
+        data = Path(hf_hub_download(REPO, upstream, revision=REVISION)).read_bytes()
         entries.append((target, data))
     with tarfile.open(OUTPUT, "w:gz") as archive:
         for filename, data in entries:
@@ -40,6 +43,7 @@ def main():
         "archive_size": len(archive_data),
         "installed_size": sum(len(data) for _, data in entries),
         "model_repo": REPO,
+        "model_revision": REVISION,
         "license": "CC BY-NC 4.0",
     }
     Path("leokani-bundle-metadata.json").write_text(json.dumps(manifest, indent=2) + "\n")
