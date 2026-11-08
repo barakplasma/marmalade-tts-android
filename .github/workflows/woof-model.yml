@@ -1,0 +1,66 @@
+name: Export and package Underdog Woof ONNX (noncommercial)
+on:
+  push:
+    branches: [feat/woof-onnx]
+    paths:
+      - ".github/workflows/woof-model.yml"
+      - "tools/woof-convert/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: woof-model-export
+  cancel-in-progress: true
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install NumPy-to-ONNX export dependencies (build host only)
+        run: pip install numpy huggingface_hub onnx onnxruntime
+      - name: Export Woof three graphs, test numerical parity, package assets
+        run: python tools/woof-convert/package.py
+      - name: Verify model archive layout
+        run: |
+          tar -tzf woof-onnx-v1.tar.gz > woof-paths.txt
+          for name in speech_step.onnx flow_head.onnx decoder.onnx \
+            text_emb.npy bos.npy lat_in_w.npy lat_in_b.npy \
+            voice_juno.npy voice_mira.npy LICENSE NOTICE MODEL_CARD.md manifest.json; do
+            grep -Fx "woof-onnx-v1/$name" woof-paths.txt >/dev/null
+          done
+          sha256sum woof-onnx-v1.tar.gz > SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: woof-onnx-validated-bundle
+          path: |
+            woof-onnx-v1.tar.gz
+            woof-bundle-metadata.json
+            SHA256SUMS.txt
+          retention-days: 30
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: woof-model-v1
+          name: Underdog Woof ONNX — Juno and Mira (noncommercial)
+          target_commitish: ${{ github.sha }}
+          prerelease: true
+          draft: false
+          body: |
+            Unofficial, converted Underdog Woof TTS model weights.
+            Uses standard ONNX operations in flow head, autoregressive speech
+            transformer, and variable-length audio decoder.
+            Source: https://huggingface.co/ConwayResearch/Underdog-Woof
+            Original license: Underdog Noncommercial License. All converted
+            weights remain restricted to noncommercial use with attribution.
+            Model and license/notice files are included; no Python runtime.
+            **This is experimental and not endorsed by Underdog.**
+          files: |
+            woof-onnx-v1.tar.gz
+            woof-bundle-metadata.json
+            SHA256SUMS.txt
