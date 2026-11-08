@@ -4,6 +4,7 @@ import app.marmalade.tts.data.CloudApiVoiceCatalog
 import app.marmalade.tts.data.KittenDirectVoiceCatalog
 import app.marmalade.tts.data.LeokaniVoiceCatalog
 import app.marmalade.tts.data.ParadeeVoiceCatalog
+import app.marmalade.tts.data.PiVoVoiceCatalog
 import app.marmalade.tts.data.KokoroDirectVoiceCatalog
 import app.marmalade.tts.data.KokoroGermanVoiceCatalog
 import app.marmalade.tts.data.PocketDevVoiceCatalog
@@ -13,6 +14,7 @@ import app.marmalade.tts.engine.api.CloudApiEngine
 import app.marmalade.tts.engine.kitten.KittenDirectEngine
 import app.marmalade.tts.engine.leokani.LeokaniEngine
 import app.marmalade.tts.engine.paradee.ParadeeEngine
+import app.marmalade.tts.engine.pivo.PiVoEngine
 import app.marmalade.tts.engine.kokoro.KokoroDirectEngine
 import app.marmalade.tts.engine.kokoro.KokoroGermanEngine
 import app.marmalade.tts.engine.vits.VitsDirectEngine
@@ -43,12 +45,13 @@ class EngineRegistry internal constructor(engines: List<TtsEngine>) {
         kittenDirect: KittenDirectEngine,
         leokani: LeokaniEngine,
         paradee: ParadeeEngine,
+        pivo: PiVoEngine,
         pocket: PocketEngine,
         pocketDev: PocketDevEngine,
         vits: VitsDirectEngine,
         cloudApi: CloudApiEngine,
         buildTypeEngines: Set<@JvmSuppressWildcards TtsEngine>,
-    ) : this(listOf(kokoroDirect, kokoroGerman, kittenDirect, leokani, paradee, pocket, pocketDev, vits, cloudApi) + buildTypeEngines)
+    ) : this(listOf(kokoroDirect, kokoroGerman, kittenDirect, leokani, paradee, pivo, pocket, pocketDev, vits, cloudApi) + buildTypeEngines)
 
     private val table: Map<String, TtsEngine> = engines.associateByTo(LinkedHashMap()) { it.engineName }
 
@@ -90,6 +93,7 @@ class EngineRegistry internal constructor(engines: List<TtsEngine>) {
             KittenDirectVoiceCatalog.ENGINE,
             LeokaniVoiceCatalog.ENGINE,
             ParadeeVoiceCatalog.ENGINE,
+            PiVoVoiceCatalog.ENGINE,
             PocketVoiceCatalog.ENGINE,
             PocketDevVoiceCatalog.ENGINE,
             VitsVoiceCatalog.ENGINE,
