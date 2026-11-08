@@ -1,0 +1,51 @@
+name: Package PiVo 1.4M neural TTS
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/pivo-model-bundle.yml"
+      - "tools/pivo/make_bundle.py"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Package pinned PiVo ONNX and CMU dictionary
+        run: |
+          pip install huggingface_hub
+          python tools/pivo/make_bundle.py
+          sha256sum pivo-1m-v1.tar.gz > SHA256SUMS.txt
+      - name: Verify archive layout
+        run: |
+          tar -tzf pivo-1m-v1.tar.gz > paths.txt
+          for f in encoder.onnx decoder.onnx conditioning.onnx vocoder_step.onnx metadata.json cmudict.dict LICENSE CMUDICT_LICENSE MODEL_CARD.md THIRD_PARTY.md; do
+            grep -Fx "pivo-1m-v1/$f" paths.txt > /dev/null
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pivo-int8-two-voice-model
+          path: |
+            pivo-1m-v1.tar.gz
+            pivo-bundle-metadata.json
+            SHA256SUMS.txt
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: pivo-model-v1
+          name: PiVo 1.4M two-voice ONNX model
+          target_commitish: ${{ github.sha }}
+          prerelease: true
+          body: |
+            PiVo 1.4M optional Apache-2.0 model from empero-ai/PiVo-1.4M.
+            Includes four ONNX graphs, CMU pronouncing dictionary, and
+            model/dictionary license and attribution files.
+          files: |
+            pivo-1m-v1.tar.gz
+            pivo-bundle-metadata.json
+            SHA256SUMS.txt
