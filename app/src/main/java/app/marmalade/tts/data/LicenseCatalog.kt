@@ -311,6 +311,17 @@ object LicenseCatalog {
                 "G2P tables follows, is adapted from polm/cutlet.",
         ),
         Component(
+            key = "phonon-31m-en",
+            name = "Gradium Phonon 31M English",
+            role = "Offline English streaming neural TTS runtime and model",
+            shipsIn = "APK native FFI and optional engine bundle",
+            licenseId = "Apache-2.0",
+            copyright = listOf("Gradium AI and xn-ptts contributors"),
+            note = "Native Rust runtime from xn-ptts (Apache-2.0/MIT) compiled " +
+                "for Android ARM64 and x86_64; q8_0 model downloaded separately " +
+                "from a pinned Hugging Face checkpoint.",
+        ),
+        Component(
             key = "pivo-1m-v1",
             name = "PiVo 1.4M",
             role = "Experimental neural English speech model and FARGAN vocoder",

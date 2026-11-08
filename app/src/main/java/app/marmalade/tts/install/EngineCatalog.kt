@@ -637,6 +637,30 @@ object EngineCatalog {
         fdroidOnly = true,
     )
 
+    /** Phonon 31M English q8_0, Gradium Rust CPU runtime (ARM64 / x86_64). */
+    private val PHONON_31M: EngineDescriptor = EngineDescriptor(
+        name = "phonon-31m-en",
+        displayName = "Phonon",
+        releaseName = "Phonon 31M English (q8)",
+        descriptionRes = R.string.engine_phonon_desc,
+        downloadSizeBytes = 54_737_229L,
+        installedSizeBytes = 65_073_947L,
+        isRecommended = false,
+        archive = EngineArchive(
+            url = "https://github.com/barakplasma/marmalade-tts-android/releases/download/phonon-model-v1/phonon-31m-en.tar.gz",
+            sha256 = "baffcc2026141b3decfb2e150dbfca2ce16f1c685ff19a36d82e5dfc0ee1d9ad",
+            sizeBytes = 54_737_229L,
+            archiveRoot = "phonon-31m-en/",
+        ),
+        licenseNotice = "LICENSES/phonon-31m.md",
+        licenseSummaryRes = R.string.engine_phonon_license,
+        taglineRes = R.string.engine_phonon_tagline,
+        speedTier = SpeedTier.HEAVY,
+        quality = QualityGrade.BASIC,
+        languageCodes = listOf("en-US"),
+        fdroidOnly = true,
+    )
+
     private val VITS_MARMALADE: EngineDescriptor = run {
         val defaultPack = VoicePackCatalog.defaultPackFor(VoicePackCatalog.VITS_MARMALADE_ENGINE)
             ?: error("vits-marmalade-v1 has no voice packs in VoicePackCatalog")
@@ -691,6 +715,7 @@ object EngineCatalog {
         LEOKANI_TTS_7M,
         PARADEE_8M,
         PIVO_1M,
+        PHONON_31M,
         VITS_MARMALADE,
     )
 
