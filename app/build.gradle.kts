@@ -318,6 +318,8 @@ dependencies {
     // shipping engine — Kokoro Direct, Kitten Direct, and Pocket each run
     // their ONNX graphs directly on ORT (no sherpa-onnx wrapper).
     implementation("com.microsoft.onnxruntime:onnxruntime-android:1.26.0")
+    // Phonon TTS: Rust C runtime, called via the upstream JNA Kotlin wrapper.
+    implementation("net.java.dev.jna:jna:5.17.0@aar")
 
     // Media session (lock-screen + BT transport controls in MarmaladeSynthService).
     // Provides MediaSessionCompat / PlaybackStateCompat / MediaButtonReceiver.
