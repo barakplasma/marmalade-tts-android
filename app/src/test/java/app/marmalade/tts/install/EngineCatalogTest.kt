@@ -312,8 +312,8 @@ class EngineCatalogTest {
         // has no GPL components, so it's exempt — and its licenseSummary
         // must explicitly state "no GPL" so users can see the difference.
         // Both Pocket variants (prod + clean-room dev) share the GPL-free payload.
-        val pocketEngines = setOf("pocket-tts-en-v2026_04", "pocket-tts-en-v2026_04-dev")
-        val gplEngines = EngineCatalog.all.filter { it.name !in pocketEngines }
+        val enginesWithoutGpl = setOf("pocket-tts-en-v2026_04", "pocket-tts-en-v2026_04-dev", "pivo-1m-v1")
+        val gplEngines = EngineCatalog.all.filter { it.name !in enginesWithoutGpl }
         for (engine in gplEngines) {
             val summary = resources.getString(engine.licenseSummaryRes)
             assertTrue(
@@ -321,6 +321,8 @@ class EngineCatalogTest {
                 summary.lowercase().contains("gpl"),
             )
         }
+        val pivoSummary = resources.getString(EngineCatalog.byName("pivo-1m-v1")!!.licenseSummaryRes)
+        assertTrue("PiVo should disclose no GPL engine components", pivoSummary.lowercase().contains("no gpl"))
         val pocket = EngineCatalog.byName("pocket-tts-en-v2026_04")!!
         val pocketSummary = resources.getString(pocket.licenseSummaryRes)
         assertTrue(
