@@ -613,6 +613,30 @@ object EngineCatalog {
         fdroidOnly = true,
     )
 
+    /** Two synthetic 16 kHz English voices, four compact ONNX graphs. */
+    private val PIVO_1M: EngineDescriptor = EngineDescriptor(
+        name = "pivo-1m-v1",
+        displayName = "PiVo",
+        releaseName = "PiVo 1.4M (Pi / Vo)",
+        descriptionRes = R.string.engine_pivo_desc,
+        downloadSizeBytes = 6_176_682L,
+        installedSizeBytes = 9_485_515L,
+        isRecommended = false,
+        archive = EngineArchive(
+            url = "https://github.com/barakplasma/marmalade-tts-android/releases/download/pivo-model-v1/pivo-1m-v1.tar.gz",
+            sha256 = "7a96b815ce7bd319f9b2225be56d08af227425f5a3579e785951515e9616a897",
+            sizeBytes = 6_176_682L,
+            archiveRoot = "pivo-1m-v1/",
+        ),
+        licenseNotice = "LICENSES/pivo-1m.md",
+        licenseSummaryRes = R.string.engine_pivo_license,
+        taglineRes = R.string.engine_pivo_tagline,
+        speedTier = SpeedTier.HEAVY,
+        quality = QualityGrade.BASIC,
+        languageCodes = listOf("en-US"),
+        fdroidOnly = true,
+    )
+
     private val VITS_MARMALADE: EngineDescriptor = run {
         val defaultPack = VoicePackCatalog.defaultPackFor(VoicePackCatalog.VITS_MARMALADE_ENGINE)
             ?: error("vits-marmalade-v1 has no voice packs in VoicePackCatalog")
@@ -666,6 +690,7 @@ object EngineCatalog {
         POCKET_TTS_EN_DEV,
         LEOKANI_TTS_7M,
         PARADEE_8M,
+        PIVO_1M,
         VITS_MARMALADE,
     )
 
