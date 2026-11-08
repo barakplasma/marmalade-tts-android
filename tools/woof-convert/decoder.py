@@ -4,7 +4,7 @@
 import os,sys,itertools,numpy as np,onnx,onnxruntime as ort
 from onnx import helper,numpy_helper,TensorProto
 from huggingface_hub import snapshot_download
-p=snapshot_download("ConwayResearch/Underdog-Woof",allow_patterns=["woof_int8.npz","underdog_woof/*.py"])
+p=snapshot_download("ConwayResearch/Underdog-Woof",revision="be702960539777fc3f698e54335276a8391b00f9",allow_patterns=["woof_int8.npz","underdog_woof/*.py"])
 sys.path.insert(0,p)
 from underdog_woof.runtime import unflatten,Decoder,deq
 with np.load(os.path.join(p,"woof_int8.npz"),allow_pickle=False) as z:st=unflatten(z)
