@@ -59,6 +59,7 @@ object VoiceCredits {
         KokoroGermanVoiceCatalog.ENGINE -> KokoroGermanVoiceCatalog.CREDIT
         LeokaniVoiceCatalog.ENGINE -> VoiceCredit(source = "Milliwatt Labs", license = "CC BY-NC 4.0")
         ParadeeVoiceCatalog.ENGINE -> VoiceCredit(source = "Sahil Mahendrakar / Kokoro", license = "Apache-2.0")
+        PiVoVoiceCatalog.ENGINE -> VoiceCredit(source = "Empero Research / Leon Lehmann", license = "Apache-2.0")
         else -> null
     }
 }
