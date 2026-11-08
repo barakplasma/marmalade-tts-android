@@ -54,6 +54,7 @@ class EngineCatalogTest {
                 "leokani-tts-7m",
                 "paradee-8m-v1_2",
                 "pivo-1m-v1",
+                "phonon-31m-en",
                 // Developer-only while the pack UI is built out; pack-based,
                 // so its archive/sizes mirror its default voice pack.
                 "vits-marmalade-v1",
@@ -78,6 +79,7 @@ class EngineCatalogTest {
                 "leokani-tts-7m" to "Leokani 7M",
                 "paradee-8m-v1_2" to "Paradee",
                 "pivo-1m-v1" to "PiVo",
+                "phonon-31m-en" to "Phonon",
                 "vits-marmalade-v1" to "VITS Marmalade",
             ),
             EngineCatalog.all.associate { it.name to it.displayName },
@@ -149,7 +151,7 @@ class EngineCatalogTest {
         // F-Droid-only. Both engines stay resolvable via byName so nothing
         // on disk ever orphans.
         assertEquals(
-            setOf("pocket-tts-en-v2026_04-dev", "leokani-tts-7m", "paradee-8m-v1_2", "pivo-1m-v1"),
+            setOf("pocket-tts-en-v2026_04-dev", "leokani-tts-7m", "paradee-8m-v1_2", "pivo-1m-v1", "phonon-31m-en"),
             EngineCatalog.all.filter { it.fdroidOnly }.map { it.name }.toSet(),
         )
         for (showDeveloper in listOf(false, true)) {
@@ -170,7 +172,8 @@ class EngineCatalogTest {
             EngineCatalog.visibleTo(showDeveloper = false, flavor = "play").toSet() +
                 EngineCatalog.byName("leokani-tts-7m")!! +
                 EngineCatalog.byName("paradee-8m-v1_2")!! +
-                EngineCatalog.byName("pivo-1m-v1")!!,
+                EngineCatalog.byName("pivo-1m-v1")!! +
+                EngineCatalog.byName("phonon-31m-en")!!,
             EngineCatalog.visibleTo(showDeveloper = false, flavor = "fdroid").toSet(),
         )
         assertNotNull(EngineCatalog.byName("pocket-tts-en-v2026_04-dev"))
@@ -312,7 +315,7 @@ class EngineCatalogTest {
         // has no GPL components, so it's exempt — and its licenseSummary
         // must explicitly state "no GPL" so users can see the difference.
         // Both Pocket variants (prod + clean-room dev) share the GPL-free payload.
-        val enginesWithoutGpl = setOf("pocket-tts-en-v2026_04", "pocket-tts-en-v2026_04-dev", "pivo-1m-v1")
+        val enginesWithoutGpl = setOf("pocket-tts-en-v2026_04", "pocket-tts-en-v2026_04-dev", "pivo-1m-v1", "phonon-31m-en")
         val gplEngines = EngineCatalog.all.filter { it.name !in enginesWithoutGpl }
         for (engine in gplEngines) {
             val summary = resources.getString(engine.licenseSummaryRes)
@@ -323,6 +326,8 @@ class EngineCatalogTest {
         }
         val pivoSummary = resources.getString(EngineCatalog.byName("pivo-1m-v1")!!.licenseSummaryRes)
         assertTrue("PiVo should disclose no GPL engine components", pivoSummary.lowercase().contains("no gpl"))
+        val phonon = resources.getString(EngineCatalog.byName("phonon-31m-en")!!.licenseSummaryRes)
+        assertTrue("Phonon should explicitly disclose no GPL", phonon.lowercase().contains("no gpl"))
         val pocket = EngineCatalog.byName("pocket-tts-en-v2026_04")!!
         val pocketSummary = resources.getString(pocket.licenseSummaryRes)
         assertTrue(
@@ -469,7 +474,7 @@ class EngineCatalogTest {
         // Experimental Leokani uses a provisional tier; do not misrepresent it
         // as one of Max's listening-validated upstream quality grades.
         assertEquals(expected, EngineCatalog.all
-            .filterNot { it.name in setOf("leokani-tts-7m", "paradee-8m-v1_2", "pivo-1m-v1") }
+            .filterNot { it.name in setOf("leokani-tts-7m", "paradee-8m-v1_2", "pivo-1m-v1", "phonon-31m-en") }
             .associate { it.name to it.quality })
         // Pocket and Kokoro fill the meter; Kitten is one below, VITS two.
         assertEquals(4, QualityGrade.EXCELLENT.meterFill)

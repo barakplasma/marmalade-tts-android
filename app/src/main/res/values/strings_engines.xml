@@ -257,5 +257,5 @@
     <string name="engine_pivo_license">Apache-2.0 model and app port; CMU dictionary attribution included. No GPL engine components.</string>
     <string name="engine_phonon_tagline">Fast streaming English speech with a native CPU runtime.</string>
     <string name="engine_phonon_desc">Phonon 31M offline English text-to-speech using Gradium’s Rust-native inference runtime. Optional q8 model download, 24 kHz PCM, and a default voice. Experimental fork engine, currently available on 64-bit devices only.</string>
-    <string name="engine_phonon_license">Apache-2.0 / MIT native inference code and Apache-2.0 model data; JNA Android bridge distributed separately. No eSpeak-ng in Phonon’s inference path.</string>
+    <string name="engine_phonon_license">Apache-2.0 / MIT native inference code and Apache-2.0 model data, using Android JNA. No GPL components in the Phonon engine.</string>
 </resources>
