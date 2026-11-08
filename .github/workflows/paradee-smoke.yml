@@ -11,6 +11,9 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: paradee-pivo-smoke-branch
+  cancel-in-progress: true
 jobs:
   test:
     runs-on: ubuntu-latest
