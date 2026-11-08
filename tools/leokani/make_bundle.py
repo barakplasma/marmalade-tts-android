@@ -5,6 +5,7 @@ Requires: pip install huggingface_hub
 Run from the repository root: python tools/leokani/make_bundle.py
 Outputs a tar.gz and its SHA256 / sizes; no runtime Python on Android.
 """
+import gzip
 import hashlib
 import io
 import json
@@ -29,13 +30,17 @@ def main():
     for upstream, target in FILES.items():
         data = Path(hf_hub_download(REPO, upstream, revision=REVISION)).read_bytes()
         entries.append((target, data))
-    with tarfile.open(OUTPUT, "w:gz") as archive:
-        for filename, data in entries:
-            info = tarfile.TarInfo("leokani-tts-7m/" + filename)
-            info.size = len(data)
-            info.mode = 0o644
-            info.mtime = 0
-            archive.addfile(info, io.BytesIO(data))
+    # Deterministic archive: normalize both TAR member timestamps and the
+    # outer GZIP header (tarfile.open(w:gz) otherwise embeds wall clock time).
+    with OUTPUT.open("wb") as raw:
+        with gzip.GzipFile(filename="", mode="wb", fileobj=raw, mtime=0) as compressed:
+            with tarfile.open(fileobj=compressed, mode="w") as archive:
+                for filename, data in entries:
+                    info = tarfile.TarInfo("leokani-tts-7m/" + filename)
+                    info.size = len(data)
+                    info.mode = 0o644
+                    info.mtime = 0
+                    archive.addfile(info, io.BytesIO(data))
     archive_data = OUTPUT.read_bytes()
     manifest = {
         "filename": OUTPUT.name,
