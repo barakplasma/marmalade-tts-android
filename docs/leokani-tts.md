@@ -8,7 +8,7 @@ F-Droid-flavor experimental APK. No Python runtime is used on Android.
 1. Install the latest **Leokani experimental RC** from
    https://github.com/barakplasma/marmalade-tts-android/releases
    (the app's ID ends in `.rc`, so it can coexist with Marmalade).
-2. Open **Engines**, find **Leokani 7M (experimental)**, and select **Install**.
+2. Open **Engines**, find **Leokani 7M** (experimental), and select **Install**.
    The app downloads the 6.3 MB bundle from this fork's GitHub release, checks
    its SHA256, extracts `model.onnx`, `config.json`, `LICENSE`, and
    `MODEL_CARD.md`, and verifies the layout.
