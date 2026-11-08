@@ -50,6 +50,14 @@ jobs:
           key: leokani-rc-gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', 'gradle/libs.versions.toml') }}
           restore-keys: leokani-rc-gradle-${{ runner.os }}-
 
+      - name: Verify Leokani and catalog JVM unit tests
+        run: |
+          ./gradlew --no-daemon :app:testFdroidDebugUnitTest \
+            --tests 'app.marmalade.tts.install.EngineCatalogTest' \
+            --tests 'app.marmalade.tts.data.LicenseCatalogTest' \
+            --tests 'app.marmalade.tts.engine.EngineRegistryTest' \
+            --tests 'app.marmalade.tts.engine.leokani.*'
+
       - name: Build debug-signed F-Droid release candidate
         run: ./gradlew --no-daemon -PsmokeRelease :app:assembleFdroidRelease
 
