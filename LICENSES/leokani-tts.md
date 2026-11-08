@@ -1,14 +1,13 @@
-# Leokani TTS (optional English model)
+# Leokani 7M (optional download)
 
-Model and weights: [Milliwatt Labs / leokani-tts-7M](https://huggingface.co/milliwattlabs/leokani-tts-7M)
+**Model:** [milliwattlabs/leokani-tts-7M](https://huggingface.co/milliwattlabs/leokani-tts-7M)
 
-The model weights are licensed under **CC BY-NC 4.0**. Model credit: Milliwatt Labs.
-See the upstream model repository's LICENSE, README, and model card for full conditions.
-This optional engine is intended for noncommercial use.
+**Model weights:** Creative Commons Attribution–NonCommercial 4.0 (CC BY-NC 4.0). The license and model card are included **verbatim in the optional engine archive** as `LICENSE` and `MODEL_CARD.md`. No model weights are included in the APK.
 
-The source code for Marmalade's Leokani ONNX wrapper, pronunciation mapping,
-and inverse STFT is independent Kotlin code. It does not embed Python or the
-upstream inference runtime. Model distribution and licensing are distinct
-from the Marmalade source license.
+**Source revision:** `ba0beb24f7b124dc1eb297ffc28d01db892462bd`
 
-The upstream model's training samples used Kokoro-82M-generated audio.
+**Redistributed bundle:** [leokani-model-v1](https://github.com/barakplasma/marmalade-tts-android/releases/tag/leokani-model-v1)
+
+**Application runtime:** the app's existing ONNX Runtime and eSpeak-ng, plus independently implemented Kotlin inverse STFT/phoneme mapping. The upstream model and G2P licenses are independent of the Marmalade app source license.
+
+This experimental fork uses the model for noncommercial purposes. The model does not grant commercial rights without separate permission. See the original license for the full terms.

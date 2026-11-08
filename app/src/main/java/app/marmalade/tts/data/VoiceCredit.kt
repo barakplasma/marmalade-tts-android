@@ -57,6 +57,7 @@ object VoiceCredits {
         VitsVoiceCatalog.ENGINE ->
             VitsVoiceCatalog.packIdOf(voice.id)?.let { VoicePackCatalog.byId(it) }?.credit
         KokoroGermanVoiceCatalog.ENGINE -> KokoroGermanVoiceCatalog.CREDIT
+        LeokaniVoiceCatalog.ENGINE -> VoiceCredit(source = "Milliwatt Labs", license = "CC BY-NC 4.0")
         else -> null
     }
 }

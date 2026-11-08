@@ -561,6 +561,34 @@ object EngineCatalog {
      * Max signs them off. `fdroidOnly = false` — Play is a target, because the
      * exposed pack's weights and training data are permissive end to end.
      */
+    /**
+     * Fork-only experimental English model. Optional noncommercial CC BY-NC
+     * 4.0 weights are hosted as a data-only bundle on this fork's releases.
+     * Speed/quality grades are conservative placeholders until device A/B.
+     */
+    private val LEOKANI_TTS_7M: EngineDescriptor = EngineDescriptor(
+        name = "leokani-tts-7m",
+        displayName = "Leokani 7M (experimental)",
+        releaseName = "Leokani 7M (int8)",
+        descriptionRes = R.string.engine_leokani_desc,
+        downloadSizeBytes = 6_256_173L,
+        installedSizeBytes = 7_873_103L,
+        isRecommended = false,
+        archive = EngineArchive(
+            url = "https://github.com/barakplasma/marmalade-tts-android/releases/download/leokani-model-v1/leokani-tts-7m.tar.gz",
+            sha256 = "fbc1eb4cba47cbc7dfc532cd16515e488e414fb6bbe2d79894d642820e91d506",
+            sizeBytes = 6_256_173L,
+            archiveRoot = "leokani-tts-7m/",
+        ),
+        licenseNotice = "LICENSES/leokani-tts.md",
+        licenseSummaryRes = R.string.engine_leokani_license,
+        taglineRes = R.string.engine_leokani_tagline,
+        speedTier = SpeedTier.HEAVY,
+        quality = QualityGrade.BASIC,
+        languageCodes = listOf("en"),
+        fdroidOnly = true,
+    )
+
     private val VITS_MARMALADE: EngineDescriptor = run {
         val defaultPack = VoicePackCatalog.defaultPackFor(VoicePackCatalog.VITS_MARMALADE_ENGINE)
             ?: error("vits-marmalade-v1 has no voice packs in VoicePackCatalog")
@@ -612,6 +640,7 @@ object EngineCatalog {
         KOKORO_GERMAN,
         POCKET_TTS_EN,
         POCKET_TTS_EN_DEV,
+        LEOKANI_TTS_7M,
         VITS_MARMALADE,
     )
 

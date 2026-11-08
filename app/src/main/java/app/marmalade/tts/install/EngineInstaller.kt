@@ -1538,6 +1538,7 @@ open class EngineInstaller @Inject constructor(
         return when (descriptor.name) {
             "pocket-tts-en-v2026_04"   -> verifyPocketLayout(dir, PocketVoiceCatalog.voices)
             "pocket-tts-en-v2026_04-dev" -> verifyPocketLayout(dir, PocketDevVoiceCatalog.voices)
+            "leokani-tts-7m"          -> verifyLeokaniLayout(dir)
             "kitten-direct-v0_8"       -> verifyKittenDirectLayout(dir)
             "kokoro-direct-v1_0"       -> verifyKokoroDirectLayout(dir)
             "kokoro-de-v1_0"           -> verifyKokoroDeLayout(dir)
@@ -1680,6 +1681,17 @@ open class EngineInstaller @Inject constructor(
      * shared tree (SharedEspeakData), so the installer no longer requires or
      * checks them.
      */
+    /** Leokani model bundle: ONNX weights + vocabulary + upstream attribution. */
+    private fun verifyLeokaniLayout(dir: File): InstallState {
+        val model = File(dir, "model.onnx")
+        if (!model.isFile || model.length() < MIN_MODEL_BYTES) return InstallState.Corrupt
+        for (name in listOf("config.json", "LICENSE", "MODEL_CARD.md")) {
+            val file = File(dir, name)
+            if (!file.isFile || file.length() == 0L) return InstallState.Corrupt
+        }
+        return InstallState.Installed
+    }
+
     private fun verifyKittenDirectLayout(dir: File): InstallState {
         for (graph in listOf("planner.onnx", "gen.onnx")) {
             val file = File(dir, graph)

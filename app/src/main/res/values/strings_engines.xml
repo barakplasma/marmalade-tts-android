@@ -244,4 +244,9 @@
     <string name="pocket_bench_ar_ms">AR step %1$.1f ms</string>
     <string name="pocket_bench_detail">p90 %1$.1f ms  ·  %2$d steps  ·  cond %3$d ms</string>
     <string name="pocket_bench_no_bundle">bundle.json not found — install the Pocket engine or push it to files/pocket-quant/</string>
+    <!-- Fork-only experimental model. User-visible quality/speed need device benchmarks. -->
+    <string name="engine_leokani_tagline">A compact English neural voice that works fully offline.</string>
+    <string name="engine_leokani_desc">Experimental English text-to-speech with a small 7M-parameter model. A 6.3 MB optional download, local eSpeak pronunciation and ONNX Runtime inference. Single voice, not yet benchmarked on Android.</string>
+    <string name="engine_leokani_license">Leokani 7M model weights: CC BY-NC 4.0, noncommercial use; the optional download includes the original model card and license.</string>
+
 </resources>
