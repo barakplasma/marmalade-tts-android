@@ -7,6 +7,7 @@ on:
       - "app/src/main/**"
       - "app/src/test/**"
       - "app/src/androidTest/java/app/marmalade/tts/engine/paradee/**"
+      - "app/src/androidTest/java/app/marmalade/tts/engine/pivo/**"
   workflow_dispatch:
 permissions:
   contents: read
@@ -56,13 +57,19 @@ jobs:
             adb install -r app/build/outputs/apk/androidTest/fdroid/debug/app-fdroid-debug-androidTest.apk
             adb shell am instrument -w -e class app.marmalade.tts.engine.paradee.ParadeeSynthesisInstrumentedTest app.marmalade.tts.debug.test/androidx.test.runner.AndroidJUnitRunner | tee paradee-instrumentation.log
             grep -F 'OK (1 test)' paradee-instrumentation.log
+            adb shell am instrument -w -e class app.marmalade.tts.engine.pivo.PiVoSynthesisInstrumentedTest app.marmalade.tts.debug.test/androidx.test.runner.AndroidJUnitRunner | tee pivo-instrumentation.log
+            grep -F 'OK (1 test)' pivo-instrumentation.log
             adb exec-out run-as app.marmalade.tts.debug cat files/paradee-smoke.pcm > paradee-smoke.pcm
             python3 -c "import wave,pathlib; pcm=pathlib.Path('paradee-smoke.pcm').read_bytes(); w=wave.open('paradee-smoke.wav','wb'); w.setnchannels(1); w.setsampwidth(2); w.setframerate(24000); w.writeframes(pcm); w.close()"
+            adb exec-out run-as app.marmalade.tts.debug cat files/pivo-smoke.pcm > pivo-smoke.pcm
+            python3 -c "import wave,pathlib; pcm=pathlib.Path('pivo-smoke.pcm').read_bytes(); w=wave.open('pivo-smoke.wav','wb'); w.setnchannels(1); w.setsampwidth(2); w.setframerate(16000); w.writeframes(pcm); w.close()"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: paradee-android-evidence
+          name: paradee-pivo-android-evidence
           path: |
             paradee-instrumentation.log
             paradee-smoke.wav
+            pivo-instrumentation.log
+            pivo-smoke.wav
           if-no-files-found: ignore
