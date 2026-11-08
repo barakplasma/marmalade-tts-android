@@ -10,6 +10,7 @@ on:
       - "app/src/androidTest/java/app/marmalade/tts/engine/pivo/**"
       - "app/src/androidTest/java/app/marmalade/tts/engine/phonon/**"
       - "app/build.gradle.kts"
+      - "app/gradle.lockfile"
   workflow_dispatch:
 permissions:
   contents: read
