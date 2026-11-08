@@ -53,6 +53,7 @@ class EngineCatalogTest {
                 // Optional fork-only Leokani model (F-Droid experimental).
                 "leokani-tts-7m",
                 "paradee-8m-v1_2",
+                "pivo-1m-v1",
                 // Developer-only while the pack UI is built out; pack-based,
                 // so its archive/sizes mirror its default voice pack.
                 "vits-marmalade-v1",
@@ -76,6 +77,7 @@ class EngineCatalogTest {
                 "pocket-tts-en-v2026_04-dev" to "Pocket TTS Clean",
                 "leokani-tts-7m" to "Leokani 7M",
                 "paradee-8m-v1_2" to "Paradee",
+                "pivo-1m-v1" to "PiVo",
                 "vits-marmalade-v1" to "VITS Marmalade",
             ),
             EngineCatalog.all.associate { it.name to it.displayName },
@@ -147,7 +149,7 @@ class EngineCatalogTest {
         // F-Droid-only. Both engines stay resolvable via byName so nothing
         // on disk ever orphans.
         assertEquals(
-            setOf("pocket-tts-en-v2026_04-dev", "leokani-tts-7m", "paradee-8m-v1_2"),
+            setOf("pocket-tts-en-v2026_04-dev", "leokani-tts-7m", "paradee-8m-v1_2", "pivo-1m-v1"),
             EngineCatalog.all.filter { it.fdroidOnly }.map { it.name }.toSet(),
         )
         for (showDeveloper in listOf(false, true)) {
@@ -167,7 +169,8 @@ class EngineCatalogTest {
             "the F-Droid flavor adds experimental Leokani while Play excludes it",
             EngineCatalog.visibleTo(showDeveloper = false, flavor = "play").toSet() +
                 EngineCatalog.byName("leokani-tts-7m")!! +
-                EngineCatalog.byName("paradee-8m-v1_2")!!,
+                EngineCatalog.byName("paradee-8m-v1_2")!! +
+                EngineCatalog.byName("pivo-1m-v1")!!,
             EngineCatalog.visibleTo(showDeveloper = false, flavor = "fdroid").toSet(),
         )
         assertNotNull(EngineCatalog.byName("pocket-tts-en-v2026_04-dev"))
@@ -464,7 +467,7 @@ class EngineCatalogTest {
         // Experimental Leokani uses a provisional tier; do not misrepresent it
         // as one of Max's listening-validated upstream quality grades.
         assertEquals(expected, EngineCatalog.all
-            .filterNot { it.name in setOf("leokani-tts-7m", "paradee-8m-v1_2") }
+            .filterNot { it.name in setOf("leokani-tts-7m", "paradee-8m-v1_2", "pivo-1m-v1") }
             .associate { it.name to it.quality })
         // Pocket and Kokoro fill the meter; Kitten is one below, VITS two.
         assertEquals(4, QualityGrade.EXCELLENT.meterFill)
