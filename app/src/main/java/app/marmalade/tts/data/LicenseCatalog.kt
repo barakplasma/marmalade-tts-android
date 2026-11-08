@@ -134,6 +134,10 @@ object LicenseCatalog {
             "https://creativecommons.org/licenses/by/4.0/legalcode.txt",
         ),
         License(
+            "CC-BY-NC-4.0", "CC-BY-NC-4.0.txt",
+            "https://creativecommons.org/licenses/by-nc/4.0/legalcode.txt",
+        ),
+        License(
             "CC-BY-SA-4.0", "CC-BY-SA-4.0.txt",
             "https://creativecommons.org/licenses/by-sa/4.0/legalcode.txt",
         ),
@@ -305,6 +309,17 @@ object LicenseCatalog {
             textAsset = "cutlet.txt",
             note = "misaki's cutlet.py, which the Kotlin port of the Japanese " +
                 "G2P tables follows, is adapted from polm/cutlet.",
+        ),
+        Component(
+            key = "leokani-tts-7m",
+            name = "Leokani 7M (Milliwatt Labs)",
+            role = "Optional English neural voice model",
+            shipsIn = "Engine bundle (downloaded)",
+            licenseId = "CC-BY-NC-4.0",
+            copyright = listOf("Leokani 7M model by Milliwatt Labs"),
+            note = "The int8 ONNX weights and original model card are " +
+                "downloaded from a pinned revision of milliwattlabs/leokani-tts-7M. " +
+                "The app's Kotlin inference runtime contains no model weights.",
         ),
         Component(
             key = "kokoro",
