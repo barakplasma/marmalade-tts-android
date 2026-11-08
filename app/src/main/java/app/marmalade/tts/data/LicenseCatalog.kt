@@ -311,6 +311,16 @@ object LicenseCatalog {
                 "G2P tables follows, is adapted from polm/cutlet.",
         ),
         Component(
+            key = "paradee-8m-v1_2",
+            name = "Paradee 8M v1.2",
+            role = "Optional four-voice English neural TTS model",
+            shipsIn = "Engine bundle (downloaded)",
+            licenseId = "Apache-2.0",
+            copyright = listOf("Paradee model by Sahil Mahendrakar and contributors; distilled from Kokoro-82M"),
+            note = "Phoneme conversion follows upstream Paradee's Apache-2.0 " +
+                "web/misaki.js conventions. Optional model weights are separately downloaded.",
+        ),
+        Component(
             key = "leokani-tts-7m",
             name = "Leokani 7M (Milliwatt Labs)",
             role = "Optional English neural voice model",
