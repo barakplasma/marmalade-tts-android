@@ -1,0 +1,72 @@
+name: Build Phonon native Android CPU library
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/phonon-native.yml"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: phonon-native-build
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,x86_64-linux-android
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - name: Install NDK r28
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "ndk;28.2.13676358"
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/28.2.13676358" >> "$GITHUB_ENV"
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: upstream-ptts
+      - name: Clone pinned Gradium Phonon runtime
+        run: |
+          git clone https://github.com/gradium-ai/xn-ptts upstream-ptts
+          cd upstream-ptts
+          git checkout e5110afd3ead725c940b6411eec4985fb8b111aa
+      - name: Install cargo-ndk
+        run: cargo install cargo-ndk --locked
+      - name: Compile CPU backend for Pixel and emulator
+        run: |
+          cd upstream-ptts
+          ./android/build.sh
+          find android/jniLibs -name libptts_ffi.so -exec ls -lh {} \;
+      - name: Create reproducible native archive
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          cp -R upstream-ptts/android/jniLibs dist/
+          (cd dist && tar --sort=name --mtime=@0 --owner=0 --group=0 --numeric-owner -czf ../phonon-android-native.tar.gz jniLibs)
+          sha256sum phonon-android-native.tar.gz > SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: phonon-android-cpu-libraries
+          path: |
+            phonon-android-native.tar.gz
+            SHA256SUMS.txt
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: phonon-native-v1
+          name: Phonon Android native CPU libraries (Apache-2.0/MIT)
+          target_commitish: ${{ github.sha }}
+          prerelease: true
+          body: |
+            Built at Gradium xn-ptts source revision
+            e5110afd3ead725c940b6411eec4985fb8b111aa.
+            Contains CPU ARM64 and x86_64 libptts_ffi.so for Marmalade.
+            Built with Android NDK r28 and 16 KB page alignment.
+            Source: https://github.com/gradium-ai/xn-ptts
+          files: |
+            phonon-android-native.tar.gz
+            SHA256SUMS.txt
