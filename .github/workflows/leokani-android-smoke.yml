@@ -1,0 +1,72 @@
+name: Leokani Android emulator synthesis smoke test
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/leokani-android-smoke.yml"
+      - "app/src/androidTest/java/app/marmalade/tts/engine/leokani/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  synthesize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - name: Install Android toolchain
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "ndk;26.3.11579264" "cmake;3.22.1"
+
+      - name: Download pinned Leokani ONNX model
+        run: |
+          set -euo pipefail
+          URL="https://github.com/barakplasma/marmalade-tts-android/releases/download/leokani-model-v1/leokani-tts-7m.tar.gz"
+          curl -fL --retry 3 --output model-bundle.tar.gz "$URL"
+          echo "fbc1eb4cba47cbc7dfc532cd16515e488e414fb6bbe2d79894d642820e91d506  model-bundle.tar.gz" | sha256sum -c -
+          mkdir -p model-bundle
+          tar -xzf model-bundle.tar.gz -C model-bundle
+          test -s model-bundle/leokani-tts-7m/model.onnx
+          test -s model-bundle/leokani-tts-7m/config.json
+
+      - name: Build debug app and androidTest APK
+        run: ./gradlew --no-daemon :app:assembleFdroidDebug :app:assembleFdroidDebugAndroidTest
+
+      - name: Run real ONNX and espeak synthesis on Android emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          disable-animations: true
+          script: |
+            set -e
+            adb install -r app/build/outputs/apk/fdroid/debug/app-fdroid-debug.apk
+            adb install -r app/build/outputs/apk/androidTest/fdroid/debug/app-fdroid-debug-androidTest.apk
+            adb push model-bundle/leokani-tts-7m/model.onnx /data/local/tmp/leokani-model.onnx
+            adb push model-bundle/leokani-tts-7m/config.json /data/local/tmp/leokani-config.json
+            adb shell run-as app.marmalade.tts.debug mkdir -p files/engines/leokani-tts-7m
+            adb shell run-as app.marmalade.tts.debug cp /data/local/tmp/leokani-model.onnx files/engines/leokani-tts-7m/model.onnx
+            adb shell run-as app.marmalade.tts.debug cp /data/local/tmp/leokani-config.json files/engines/leokani-tts-7m/config.json
+            adb shell am instrument -w -e class app.marmalade.tts.engine.leokani.LeokaniSynthesisInstrumentedTest app.marmalade.tts.debug.test/androidx.test.runner.AndroidJUnitRunner | tee leokani-instrumentation.log
+            grep -F "OK (1 test)" leokani-instrumentation.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leokani-instrumentation-log
+          path: leokani-instrumentation.log
+          if-no-files-found: ignore
