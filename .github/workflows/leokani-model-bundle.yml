@@ -31,9 +31,10 @@ jobs:
       - name: Verify bundle paths and license
         run: |
           set -euo pipefail
-          tar -tzf leokani-tts-7m.tar.gz
+          tar -tzf leokani-tts-7m.tar.gz > bundle-paths.txt
+          cat bundle-paths.txt
           for path in model.onnx config.json LICENSE MODEL_CARD.md; do
-            tar -tzf leokani-tts-7m.tar.gz | grep -qx "leokani-tts-7m/$path"
+            grep -Fx "leokani-tts-7m/$path" bundle-paths.txt >/dev/null
           done
       - uses: actions/upload-artifact@v4
         with:
