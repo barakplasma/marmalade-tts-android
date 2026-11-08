@@ -1,0 +1,45 @@
+name: Package Phonon 31M English q8 model
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/phonon-model-bundle.yml"
+      - "tools/phonon/make_bundle.py"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Build pinned Phonon checkpoint
+        run: |
+          pip install huggingface_hub
+          python tools/phonon/make_bundle.py
+          sha256sum phonon-31m-en.tar.gz > SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: phonon-q8-model-bundle
+          path: |
+            phonon-31m-en.tar.gz
+            phonon-bundle-metadata.json
+            SHA256SUMS.txt
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: phonon-model-v1
+          name: Phonon 31M English q8 optional model data
+          target_commitish: ${{ github.sha }}
+          prerelease: true
+          body: |
+            Optional Apache-2.0/MIT Phonon 31M q8 model data from
+            pinned gradium/phonon-31m-en. Apache and MIT license texts
+            included. The FFI runtime is built separately into the APK.
+          files: |
+            phonon-31m-en.tar.gz
+            phonon-bundle-metadata.json
+            SHA256SUMS.txt
