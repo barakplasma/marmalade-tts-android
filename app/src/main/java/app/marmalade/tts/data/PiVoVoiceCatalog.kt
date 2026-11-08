@@ -9,10 +9,10 @@ object PiVoVoiceCatalog {
     val VOICE_KEYS = listOf("pi", "vo")
     val voices = listOf(
         VoiceMeta(id = "$ENGINE:pi", engine = ENGINE, displayName = "Pi",
-            languageCode = "en-US", sampleRate = SAMPLE_RATE, gender = "female",
+            languageCode = "en-US", sampleRate = SAMPLE_RATE, gender = null,
             isInstalled = false, sortOrder = 0),
         VoiceMeta(id = "$ENGINE:vo", engine = ENGINE, displayName = "Vo",
-            languageCode = "en-US", sampleRate = SAMPLE_RATE, gender = "male",
+            languageCode = "en-US", sampleRate = SAMPLE_RATE, gender = null,
             isInstalled = false, sortOrder = 1),
     )
 }
