@@ -8,6 +8,8 @@ on:
       - "app/src/test/**"
       - "app/src/androidTest/java/app/marmalade/tts/engine/paradee/**"
       - "app/src/androidTest/java/app/marmalade/tts/engine/pivo/**"
+      - "app/src/androidTest/java/app/marmalade/tts/engine/phonon/**"
+      - "app/build.gradle.kts"
   workflow_dispatch:
 permissions:
   contents: read
@@ -17,7 +19,7 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
         with:
@@ -33,6 +35,15 @@ jobs:
         run: |
           yes | sdkmanager --licenses >/dev/null || true
           sdkmanager "ndk;26.3.11579264" "cmake;3.22.1"
+      - name: Install pinned Phonon ARM64 and x86_64 native FFI libraries
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 -o phonon-native.tar.gz \
+            https://github.com/barakplasma/marmalade-tts-android/releases/download/phonon-native-v1/phonon-android-native.tar.gz
+          echo "677c956addda601017b88294f04b783f92ba7e1b632cb6886980b5f47818038b  phonon-native.tar.gz" | sha256sum -c -
+          tar -xzf phonon-native.tar.gz -C app/src/main
+          test -s app/src/main/jniLibs/arm64-v8a/libptts_ffi.so
+          test -s app/src/main/jniLibs/x86_64/libptts_ffi.so
       - name: JVM regression tests
         run: |
           ./gradlew --no-daemon :app:testFdroidDebugUnitTest \
@@ -62,17 +73,23 @@ jobs:
             grep -F 'OK (1 test)' paradee-instrumentation.log
             adb shell am instrument -w -e class app.marmalade.tts.engine.pivo.PiVoSynthesisInstrumentedTest app.marmalade.tts.debug.test/androidx.test.runner.AndroidJUnitRunner | tee pivo-instrumentation.log
             grep -F 'OK (1 test)' pivo-instrumentation.log
+            adb shell am instrument -w -e class app.marmalade.tts.engine.phonon.PhononSynthesisInstrumentedTest app.marmalade.tts.debug.test/androidx.test.runner.AndroidJUnitRunner | tee phonon-instrumentation.log
+            grep -F 'OK (1 test)' phonon-instrumentation.log
             adb exec-out run-as app.marmalade.tts.debug cat files/paradee-smoke.pcm > paradee-smoke.pcm
             python3 -c "import wave,pathlib; pcm=pathlib.Path('paradee-smoke.pcm').read_bytes(); w=wave.open('paradee-smoke.wav','wb'); w.setnchannels(1); w.setsampwidth(2); w.setframerate(24000); w.writeframes(pcm); w.close()"
             adb exec-out run-as app.marmalade.tts.debug cat files/pivo-smoke.pcm > pivo-smoke.pcm
             python3 -c "import wave,pathlib; pcm=pathlib.Path('pivo-smoke.pcm').read_bytes(); w=wave.open('pivo-smoke.wav','wb'); w.setnchannels(1); w.setsampwidth(2); w.setframerate(16000); w.writeframes(pcm); w.close()"
+            adb exec-out run-as app.marmalade.tts.debug cat files/phonon-smoke.pcm > phonon-smoke.pcm
+            python3 -c "import wave,pathlib; pcm=pathlib.Path('phonon-smoke.pcm').read_bytes(); w=wave.open('phonon-smoke.wav','wb'); w.setnchannels(1); w.setsampwidth(2); w.setframerate(24000); w.writeframes(pcm); w.close()"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: paradee-pivo-android-evidence
+          name: paradee-pivo-phonon-android-evidence
           path: |
             paradee-instrumentation.log
             paradee-smoke.wav
             pivo-instrumentation.log
             pivo-smoke.wav
+            phonon-instrumentation.log
+            phonon-smoke.wav
           if-no-files-found: ignore
